@@ -1,0 +1,23 @@
+cio Terraform 1:
+Crea el código de terraform necesario para desplegar:
+
+
+	
+Un resource group de nombre azurerg-israel
+	
+Un service plan de nombre azuresp-israel
+	
+una webapp de nombre azureweb-israel
+
+La web app debe ser gratuita (SKU Free) 
+ 
+Requisitos:
+
+
+	
+usar variables de entrada (variables.tf) y un fichero tfvars para un entorno en concreto
+	
+generar un output que muestre la url de acceso a la webapp
+	
+cada uno de los recursos debe ser un modulo de terraform (serviceplans, resourcegroups, etc):wq
+
