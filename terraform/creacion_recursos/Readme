@@ -19,5 +19,5 @@ usar variables de entrada (variables.tf) y un fichero tfvars para un entorno en 
 	
 generar un output que muestre la url de acceso a la webapp
 	
-cada uno de los recursos debe ser un modulo de terraform (serviceplans, resourcegroups, etc):wq
+cada uno de los recursos debe ser un modulo de terraform (serviceplans, resourcegroups, etc)
 
