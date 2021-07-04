@@ -12,22 +12,33 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "my_resource" {
-	name = "azurerg-israel"
-	location = "West Europe"
+	name = var.name
+	location = var.location
 	tags = {
 		entorno = "test"
 		tipo = "webapp"
 	}
 }
 
+module "azureweb-israel" {
+  source = "./modules/azureweb-israel"
+  tier_ = var.tier_
+  size_ = var.size_
+}
+
+
+
+
+
+/*
 resource "azurerm_app_service_plan" "mywebapp" {
 	name = "azuresp-israel"
 	location = azurerm_resource_group.my_resource.location
 	resource_group_name = azurerm_resource_group.my_resource.name
 	
 	sku {
-		tier = "Free"
-		size = "F1"
+		tier = var.tier_
+		size = var.size_
 	}
 }
-
+*/
