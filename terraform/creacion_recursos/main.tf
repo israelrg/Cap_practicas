@@ -26,6 +26,18 @@ module "azureweb-israel" {
   size_ = var.size_
 }
 
+output "myid"{
+	
+	value = azurerm_resource_group.my_resource.id
+}
+output "myip"{
+	value = module.azureweb-israel.service_url
+}
+
+
+
+
+
 
 
 

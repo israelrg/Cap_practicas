@@ -1,7 +1,10 @@
+
 variable tier_{
+    
     validation {
+        
         condition = var.tier_ == "Free"
-        error_message = "Error prueba con Free."
+        error_message = "La susbcription tiene que ser Free."
     }
 }
 

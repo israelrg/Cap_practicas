@@ -1,5 +1,5 @@
 
-resource "azurerm_app_service_plan" "mywebapp" {
+resource "azurerm_app_service_plan" "my_service_plan" {
 	name = "azureweb-israel"
 	location = "West Europe"
     resource_group_name = "azurerg-israel"
@@ -8,3 +8,19 @@ resource "azurerm_app_service_plan" "mywebapp" {
 		size = var.size_
 	}
 }
+
+
+resource "azurerm_app_service" "my_webapp" {
+	name = "myapppppp"
+	location = "West Europe"
+	resource_group_name = "azurerg-israel"
+	app_service_plan_id = azurerm_app_service_plan.my_service_plan.id
+}
+
+/*
+output "ip"{
+    description = "Direccion de la ip"
+    value = azurerm_app_service.my_webapp.*.aws_eip
+}
+
+*/

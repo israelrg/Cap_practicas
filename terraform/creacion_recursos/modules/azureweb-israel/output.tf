@@ -1,6 +1,10 @@
+output "service_url" {
+  description = "Application URL"
+  value       = azurerm_app_service.my_webapp.location
+}
+
 /*
-output "instance_ip_addr"{
-    description = "Direccion de la ip"
-    value = azurerm_app_service_plan.mywebapp.private_ip_address
+output "instance_ips" {
+  value = azurerm_app_service_plan.mywebapp.web.*.public_ip
 }
 */
