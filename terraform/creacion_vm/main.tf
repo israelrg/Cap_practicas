@@ -39,14 +39,14 @@ resource "azurerm_subnet" "main" {
   address_prefixes = ["10.0.2.0/24"]
 }
 
-# LEVANTAR INTERFACES DE RED. 
-# DE MOMENTO SOLO LEVANTO UNA. PROBAR A CREAR 2
+# LEVANTAR INTERFAZ DE RED. 
+# El nic lo crea como un recurso independendiente
 resource "azurerm_network_interface" "main" {
   name = "nic1"
   location = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
-  # De momento esta e dinamica. Mirar como manejar DHCP
+  # Dejar en dinamica. Mirar como manejar DHCP
   ip_configuration {
     name = "internal"
     subnet_id = azurerm_subnet.main.id
@@ -58,7 +58,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   name = "VM_prueba"
   resource_group_name = azurerm_resource_group.main.name
   location  = azurerm_resource_group.main.location
-  size = "Free_F1" # FREE_F1 no funciona
+  size = "Standard_B1s" # FREE_F1 no funciona
   admin_username = "adminuser"
   network_interface_ids = [
     azurerm_network_interface.main.id,
