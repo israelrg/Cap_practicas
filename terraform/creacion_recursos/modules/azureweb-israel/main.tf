@@ -17,10 +17,4 @@ resource "azurerm_app_service" "my_webapp" {
 	app_service_plan_id = azurerm_app_service_plan.my_service_plan.id
 }
 
-/*
-output "ip"{
-    description = "Direccion de la ip"
-    value = azurerm_app_service.my_webapp.*.aws_eip
-}
 
-*/
