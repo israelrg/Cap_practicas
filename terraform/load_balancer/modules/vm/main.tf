@@ -5,7 +5,6 @@ resource "azurerm_network_interface" "main" {
   name = var.nic_
   location = var.location_
   resource_group_name = var.resource_
-
   # Dejar en dinamica. Mirar como manejar DHCP
   ip_configuration {
     name = "internal"
@@ -14,6 +13,17 @@ resource "azurerm_network_interface" "main" {
   } #maquina huerfana si no se configura el nic
 }
 
+resource "azurerm_network_interface_backend_address_pool_association" "main" {
+      network_interface_id    = azurerm_network_interface.main.id
+      ip_configuration_name   = "internal"
+      backend_address_pool_id = var.poolID_
+    }
+
+
+resource "azurerm_network_interface_security_group_association" "main" {
+    network_interface_id      = azurerm_network_interface.main.id
+    network_security_group_id = var.security_group_id_
+}
 # CREACION DE LA VM 
 resource "azurerm_linux_virtual_machine" "main" {
   name = var.namevm_
@@ -46,3 +56,4 @@ resource "azurerm_linux_virtual_machine" "main" {
     version   = "latest"
   }
 }
+

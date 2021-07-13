@@ -18,3 +18,14 @@ variable "location_" {
 variable "subnet_id_" {
     type = string
 }
+
+variable "security_group_id_" {
+    type = string
+}
+
+
+variable "poolID_" {
+    type = string
+}
+
+

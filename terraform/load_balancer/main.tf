@@ -11,15 +11,11 @@ terraform {
 provider "azurerm" {
   features {}
 }
-
-
 /*
 RESOURCES QUE NECESITAN DE ID COMO PARAMETRO
 - frontend_ip_configuration IN azurrerm_lb
 - azurerm_lb_backend_address_pool IN ID LOAD BALANCER
 */
-
-
 resource "azurerm_resource_group" "main" {
   name     = "isra_resource"
   location = "westeurope"
@@ -42,11 +38,9 @@ resource "azurerm_lb" "main"{
     name = "myLoadBalancer"
     location = azurerm_resource_group.main.location
     resource_group_name = azurerm_resource_group.main.name
-    sku = "Basic"
-
-    
+    sku = "Basic"    
     frontend_ip_configuration {
-        name = "publicIPLoadBalancer"
+        name = var.publicIPName_
         public_ip_address_id = azurerm_public_ip.main.id
     }
 }
@@ -60,13 +54,52 @@ DE CARGA. REQUIERE DE DOS PASOS ADICIONALES. LO PODEMOS
 ENGANCHAR DIRECTAMENTE EN LA CREACION DE LAS VM
 */
 resource "azurerm_lb_backend_address_pool" "main" {
-  resource_group_name = azurerm_resource_group.main.name
   loadbalancer_id     = azurerm_lb.main.id
   name                = "poolAdress"
 }
 
 
 
+
+# RECURSO DE ANALISIS DE ESTADO DE LOS POOL (sondeo)
+resource "azurerm_lb_probe" "ssh" {
+  resource_group_name = azurerm_resource_group.main.name
+  loadbalancer_id     = azurerm_lb.main.id
+  name                = "saludssh"
+  port                = 22
+}
+
+resource "azurerm_lb_probe" "http" {
+  resource_group_name = azurerm_resource_group.main.name
+  loadbalancer_id     = azurerm_lb.main.id
+  name                = "saludhttp"
+  port                = 80
+}
+
+# CREACION DE RULES PARA LA RED DE NAT
+  resource "azurerm_lb_rule" "lbnatrule_ssh" {
+   resource_group_name            = azurerm_resource_group.main.name
+   loadbalancer_id                = azurerm_lb.main.id
+   name                           = "ssh"
+   protocol                       = "Tcp"
+   frontend_port                  = 22
+   backend_port                   = 22
+   backend_address_pool_id        = azurerm_lb_backend_address_pool.main.id
+   frontend_ip_configuration_name = var.publicIPName_
+   probe_id                       = azurerm_lb_probe.ssh.id
+}
+
+  resource "azurerm_lb_rule" "lbnatrule_http" {
+   resource_group_name            = azurerm_resource_group.main.name
+   loadbalancer_id                = azurerm_lb.main.id
+   name                           = "http"
+   protocol                       = "Tcp"
+   frontend_port                  = 80
+   backend_port                   = 80
+   backend_address_pool_id        = azurerm_lb_backend_address_pool.main.id
+   frontend_ip_configuration_name = var.publicIPName_
+   probe_id                       = azurerm_lb_probe.http.id
+}
 
 # CREACION DE LA VNET
 resource "azurerm_virtual_network" "vnet" {
@@ -85,6 +118,45 @@ resource "azurerm_subnet" "main" {
 }
 
 
+resource "azurerm_network_security_group" "main" {
+    name                = "myNetworkSecurityGroup"
+    location            = azurerm_resource_group.main.location
+    resource_group_name = azurerm_resource_group.main.name
+
+    security_rule {
+        name                       = "SSH"
+        priority                   = 1001
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "22"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+    }
+    security_rule {
+        name                       = "HTTP"
+        priority                   = 1002
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "80"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+    }
+}
+
+module "VM1"{
+    source = "./modules/vm"
+    nic_   = "nic1"
+    namevm_  = "VM1"
+    resource_ = azurerm_resource_group.main.name
+    location_ = azurerm_resource_group.main.location
+    subnet_id_ = azurerm_subnet.main.id 
+    security_group_id_ = azurerm_network_security_group.main.id
+    poolID_ = azurerm_lb_backend_address_pool.main.id
+}
 
 
 
@@ -106,14 +178,6 @@ resource "azurerm_subnet" "main" {
   address_prefixes = ["10.0.2.0/24"]
 }
 
-module "VM1"{
-    source = "./modules/vm"
-    nic_   = "nic1"
-    namevm_  = "VM1"
-    resource_ = azurerm_resource_group.main.name
-    location_ = azurerm_resource_group.main.location
-    subnet_id_ = azurerm_subnet.main.id 
-}
 
 module "VM2" {
     source = "./modules/vm"
