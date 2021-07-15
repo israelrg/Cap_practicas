@@ -147,15 +147,26 @@ resource "azurerm_network_security_group" "main" {
     }
 }
 
-module "VM1"{
+# CREAMOS EL AVAILABILITY SET. ES NECESARIO PARA
+# CREARLOS DENTRO DEL MISMO GRUPO
+# VARIAS VM
+resource "azurerm_availability_set" "main" {
+  name                = "avalSet"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+}
+
+module "VM"{
+    count = 1
     source = "./modules/vm"
-    nic_   = "nic1"
-    namevm_  = "VM1"
+    nic_   = "nic${count.index}"
+    namevm_  = "VM${count.index}"
     resource_ = azurerm_resource_group.main.name
     location_ = azurerm_resource_group.main.location
     subnet_id_ = azurerm_subnet.main.id 
     security_group_id_ = azurerm_network_security_group.main.id
     poolID_ = azurerm_lb_backend_address_pool.main.id
+    avalSetID_ = azurerm_availability_set.main.id
 }
 
 

@@ -28,4 +28,9 @@ variable "poolID_" {
     type = string
 }
 
+variable "avalSetID_" {
+    type = string
+}
+
+
 

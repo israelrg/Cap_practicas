@@ -32,6 +32,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   size = "Standard_B1s" # FREE_F1 no funciona
   admin_username = "adminuser"
   computer_name = var.namevm_
+  availability_set_id = var.avalSetID_
   network_interface_ids = [
     azurerm_network_interface.main.id,
   ]
